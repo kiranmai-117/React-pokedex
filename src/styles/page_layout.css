@@ -1,0 +1,55 @@
+body {
+  margin: 0px;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+#root {
+  display: flex;
+}
+
+.sidebar {
+  padding-top: 20px;
+  height: 100vh;
+  width: 20vw;
+  background-color: hsl(0, 0%, 87%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px
+}
+
+.nav-btn {
+  height: 1.5em;
+  border: none;
+  font-size: 22px;
+  color: hsl(0, 0%, 40%);
+  text-decoration: none;
+  padding: 10px;
+}
+
+.nav-btn:hover {
+  background-color: white;
+}
+
+.card-container {
+  padding: 20px 0px 0px 40px;
+  height: 860px;
+  width: 80vw;
+  display: grid;
+  gap: 40px;
+  overflow-y: scroll;
+  grid-template-columns: 270px 270px 270px 270px;
+}
+
+input{
+  height: 2em;
+  width:70%;
+}
+
+.search{
+  margin-left: 10px;
+}
+
+#search-btn{
+  margin-left: 10px;
+}
