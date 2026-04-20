@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { updatePokemonByType } from "./filter_pokedex";
+import "./styles/search.css";
 
 const searchPokemonByType = (e, props) => {
   e.preventDefault();
@@ -16,13 +17,17 @@ const getSelectedType = (e, props) => {
 
 const makeSuggestionList = (e, types, setList) => {
   const text = e.target.value.trim();
-  if (text) {
-    const relatedType = types.filter((type) => type.includes(text));
-    setList(relatedType);
+  if (!text) {
+    setList([]);
+    return;
   }
+  const relatedType = types.filter((type) => type.includes(text));
+  setList(relatedType);
 };
 
 const SuggestionList = (props) => {
+  if (!props.list.length) return null;
+
   const items = props.list.map((item, idx) => <li key={idx}>{item}</li>);
   return <ul onClick={(e) => getSelectedType(e, props)}>{items}</ul>;
 };

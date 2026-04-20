@@ -58,7 +58,7 @@ const NavBar = (props) => {
       id={type}
       key={type}
       onClick={({ target }) =>
-        updatePokemonByType(target.id, props.pokemon, props.state)
+        updatePokemonByType(target.id, props.pokemon, props.setPokemon)
       }
     >
       {type}
