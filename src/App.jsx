@@ -1,9 +1,11 @@
 import "./styles/card_layout.css";
 import "./styles/page_layout.css";
 import "./styles/colors.css";
-import { useState } from "react";
 import Search from "./search";
 import { updatePokemonByType } from "./filter_pokedex";
+import { data, allTypes } from "./assets/pokemon_data.js";
+import { createContext, useContext, useState } from "react";
+import { PokemonContext } from "./context";
 
 const StatsTable = (props) => {
   const rows = [];
@@ -52,13 +54,14 @@ const Pokedex = (props) => {
 };
 
 const NavBar = (props) => {
-  const types = props.allTypes.map((type) => (
+  const context = useContext(PokemonContext);
+  const types = context.allTypes.map((type) => (
     <button
       className="nav-btn"
       id={type}
       key={type}
       onClick={({ target }) =>
-        updatePokemonByType(target.id, props.pokemon, props.setPokemon)
+        updatePokemonByType(target.id, context.pokemon, context.setPokemon)
       }
     >
       {type}
@@ -66,11 +69,7 @@ const NavBar = (props) => {
   ));
   return (
     <nav className="sidebar">
-      <Search
-        setPokemon={props.setPokemon}
-        pokemon={props.pokemon}
-        types={props.allTypes}
-      ></Search>
+      <Search></Search>
       {types}
     </nav>
   );
@@ -78,19 +77,14 @@ const NavBar = (props) => {
 
 const App = (props) => {
   const [pokemon, setPokemon] = useState(props.pokemon);
+  const context = useContext(PokemonContext);
 
-  const nav = (
-    <NavBar
-      pokemon={props.pokemon}
-      allTypes={props.allTypes}
-      key="nav"
-      setPokemon={setPokemon}
-    ></NavBar>
+  return (
+    <PokemonContext value={{ ...context, pokemon, setPokemon }}>
+      <NavBar key="nav"></NavBar>
+      <Pokedex pokemon={pokemon} type="all" key="pokedex"></Pokedex>
+    </PokemonContext>
   );
-  const pokedex = (
-    <Pokedex pokemon={pokemon} type="all" key="pokedex"></Pokedex>
-  );
-  return [nav, pokedex];
 };
 
 export default App;

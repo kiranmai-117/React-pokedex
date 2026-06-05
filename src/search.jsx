@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useContext, useReducer, useState } from "react";
 import { updatePokemonByType } from "./filter_pokedex";
 import "./styles/search.css";
+import { produce } from "immer";
+import { PokemonContext } from "./context";
 
-const searchPokemonByType = (e, props) => {
+const searchPokemonByType = (e, pokemon, setPokemon) => {
   e.preventDefault();
   const type = new FormData(e.target).get("search");
-  updatePokemonByType(type.toLowerCase(), props.pokemon, props.setPokemon);
+  updatePokemonByType(type.toLowerCase(), pokemon, setPokemon);
   e.target.reset();
 };
 
@@ -15,44 +17,64 @@ const getSelectedType = (e, props) => {
   props.setList([]);
 };
 
-const makeSuggestionList = (e, types, setList) => {
-  const text = e.target.value.trim();
-  if (!text) {
-    setList([]);
-    return;
+const searchReducer = (state, action) => {
+  switch (action.type) {
+    case "make-list": {
+      if (!action.text) return [];
+      return produce(action.types, (draft) =>
+        draft.filter((type) => type.includes(action.text)),
+      );
+    }
+    case "search-type": {
+      updatePokemonByType(action.pType, action.pokemon, action.setPokemon);
+      return [];
+    }
   }
-  const relatedType = types.filter((type) => type.includes(text));
-  setList(relatedType);
 };
 
 const SuggestionList = (props) => {
   if (!props.list.length) return null;
 
   const items = props.list.map((item, idx) => <li key={idx}>{item}</li>);
-  return <ul onClick={(e) => getSelectedType(e, props)}>{items}</ul>;
+  return <ul onClick={props.handleSelection}>{items}</ul>;
 };
 
 const Search = (props) => {
-  const [list, setList] = useState([]);
+  const [list, dispatch] = useReducer(searchReducer, []);
+
+  const context = useContext(PokemonContext);
+
+  const handleInput = (e) => {
+    const text = e.target.value.trim();
+    dispatch({ type: "make-list", text, types: context.allTypes });
+  };
+
+  const handleSelection = (e) => {
+    dispatch({
+      type: "search-type",
+      pText: e.target.textContent,
+      pokemon: context.pokemon,
+      setPokemon: context.setPokemon,
+    });
+  };
+
   return (
     <form
       className="search"
       onSubmit={(e) => {
-        searchPokemonByType(e, props);
+        searchPokemonByType(e, context.pokemon, context.setPokemon);
       }}
     >
       <input
         type="text"
         name="search"
         placeholder="search"
-        onChange={(e) => makeSuggestionList(e, props.types, setList)}
+        onChange={handleInput}
       />
       <button id="search-btn">search</button>
       <SuggestionList
         list={list}
-        setPokemon={props.setPokemon}
-        setList={setList}
-        pokemon={props.pokemon}
+        handleSelection={handleSelection}
       ></SuggestionList>
     </form>
   );
